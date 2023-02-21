@@ -1,0 +1,10 @@
+services:
+  custom_module.data_service:
+    class: Drupal\custom_module\Services\MyCustomService
+    arguments: ['@database', '@entity_type.manager', '@http_client', '@custom_module.custom_cache']
+  custom_module.custom_cache:
+    class: Drupal\Core\Cache\CacheBackendInterface
+    tags:
+      - { name: cache.bin }
+    factory: cache_factory:get
+    arguments: [custom_cache]

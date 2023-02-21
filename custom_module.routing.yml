@@ -1,0 +1,7 @@
+custom_module.content:
+  path: '/example-path'
+  defaults:
+    _controller: '\Drupal\custom_module\Controller\MyController::myDataMethod'
+    _title: 'My Page'
+  requirements:
+    _permission: 'access content'
