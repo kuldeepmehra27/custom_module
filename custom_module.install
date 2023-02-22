@@ -1,0 +1,61 @@
+<?php
+
+/**
+ * @file
+ * Install and uninstall schema.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function custom_module_schema() {
+  $schema['custom_module_data'] = [
+    'description' => 'Stores custom module data.',
+    'fields' => [
+      'id' => [
+        'description' => 'The id this record affects.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'name' => [
+        'description' => 'The identifier of the data.',
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+        'default' => '',
+      ],
+      'serialized' => [
+        'description' => 'Whether value is serialized.',
+        'type' => 'int',
+        'size' => 'tiny',
+        'unsigned' => TRUE,
+        'default' => 0,
+      ],
+    ],
+    'primary key' => ['id'],
+  ];
+  return $schema;
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function custom_module_uninstall() {
+  $connection = \Drupal::database()->schema();
+  $connection->dropTable('custom_module_data');
+}
+
+/**
+ * Implements hook_update_N().
+ */
+function custom_module_update_9517(&$sandbox) {
+  $field = [
+    'description' => 'The location.',
+    'type' => 'varchar',
+    'length' => 255,
+  ];
+  $schema = \Drupal::database()->schema();
+  $schema->addField('custom_module_data', 'location', $field);
+}

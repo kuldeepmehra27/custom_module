@@ -1,0 +1,12 @@
+<?php
+
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\custom_module\Event\ContentOperationEvent;
+
+function custom_module_entity_update(EntityInterface $entity) {
+  if (($entity->getEntityTypeId() == 'node') && ($entity->getType() == 'article')) {
+    $node = new ContentOperationEvent($entity);
+    $event_dispatcher = \Drupal::service('event_dispatcher');
+    $event_dispatcher->dispatch(ContentOperationEvent::CONTENT_UPDATED, $node);
+  }
+}
