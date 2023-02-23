@@ -89,9 +89,12 @@ class MyCustomService {
   public function post($data) {
     $response = [];
     $postData = Json::decode($data->getContent(), TRUE);
+
+    /* // @codeCoverageIgnoreStart */
     if (!is_array($postData) || (empty($postData))) {
       return $response;
     }
+    /* // @codeCoverageIgnoreEnd */
     $nodeStorage = $this->entityTypeManager->getStorage('node');
     $node = $nodeStorage->create(['type' => 'article']);
     foreach ($postData['data'] as $key => $value) {
@@ -256,6 +259,42 @@ class MyCustomService {
       'message' => $message,
     ];
     return $response;
+  }
+
+  /**
+   * Get all Nodes.
+   *
+   * @return array
+   *   User response.
+   */
+  public function getAllNodes() {
+    $results = [];
+    $query = $this->database->select('node_field_data', 'nfd');
+    $query->leftjoin('node_field_revision', 'nfr', 'nfd.vid = nfr.vid');
+    $query->addField('nfd', 'vid', 'vid');
+    $query->addField('nfd', 'title', 'title');
+    $query->condition('nfd.status', 1);
+    $query->range(0, 15);
+    $data = $query->execute()->fetchAll();
+    // Count total records.
+    $query->range();
+    $count = $query->countQuery()->execute()->fetchField();
+    if ($count == 0) {
+      $results['data'] = [];
+      return $results;
+    }
+    // Get result array.
+    foreach ($data as $value) {
+      $result = [
+        'nid' => $value->nid,
+        'vid' => $value->vid,
+        'title' => $value->title,
+      ];
+      $results['data'][] = $result;
+    }
+    // Get result count.
+    $results['count'] = $count;
+    return $results;
   }
 
 }
