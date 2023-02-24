@@ -68,6 +68,7 @@ class MyCustomServiceTest extends UnitTestCase {
 
     // Building and managing dependency injection.
     $container = new ContainerBuilder();
+    // Set dependent services date service depends on language manager.
     $container->set('string_translation', $this->translationManager->reveal());
     \Drupal::setContainer($container);
   }
@@ -429,6 +430,13 @@ class MyCustomServiceTest extends UnitTestCase {
       ['page'],
       [''],
     ];
+  }
+
+  /**
+   * Function for unset myServiceObject object.
+   */
+  public function tearDown() {
+    unset($this->myServiceObject);
   }
 
 }
