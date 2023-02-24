@@ -406,5 +406,26 @@ class MyCustomServiceTest extends UnitTestCase {
     $result = $this->myServiceObject->getAllNodes();
     $this->assertArrayHasKey('data', $result);
   }
+  /**
+   * Function to get workflow action message.
+   *
+   * @dataProvider getContentDetailsProvider
+   * @covers ::getContentDetails
+   */
+  public function testGetContentDetails($type) {
+    $result = $this->myServiceObject->getContentDetails($type);
+    $this->assertNotEmpty($result);
+  }
+
+  /**
+   * Function to provide content type.
+   */
+  public function getContentDetailsProvider() {
+    return [
+      ['article'],
+      ['page'],
+      [''],
+    ];
+  }
 
 }

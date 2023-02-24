@@ -297,4 +297,30 @@ class MyCustomService {
     return $results;
   }
 
+  /**
+   * Function to get content details.
+   *
+   * @param string $type
+   *   The content type.
+   *
+   * @return object
+   *   Message.
+   */
+  public function getContentDetails(string $type) {
+    switch ($type) {
+      case 'article':
+        $message = 'This is article type.';
+        break;
+
+      case 'page':
+        $message = 'This is page type.';
+        break;
+
+      default:
+        $message = 'Not a valid type.';
+        break;
+    }
+    return $message;
+  }
+
 }
