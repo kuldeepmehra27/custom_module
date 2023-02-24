@@ -10,7 +10,7 @@ use Drupal\Core\Messenger\MessengerInterface;
 /**
  * Subscriber for ContentOperationEvent.
  */
-class ContentOperationEventSubscriber implements EventSubscriberInterface {
+class ContentOperationSubscriber implements EventSubscriberInterface {
 
   /**
    * My custom service.
@@ -27,7 +27,7 @@ class ContentOperationEventSubscriber implements EventSubscriberInterface {
   public $messenger;
 
   /**
-   * ContentOperationEventSubscriber constructor.
+   * ContentOperationSubscriber constructor.
    *
    * @param \Drupal\custom_module\Services\MyCustomService $my_custom_service
    *   My custom service object.

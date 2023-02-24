@@ -38,6 +38,8 @@ class MyCustomServiceTest extends UnitTestCase {
 
   /**
    * Function to setup basic requirements for test to run.
+   *
+   * Called before each test method and is used to set up the test environment.
    */
   public function setUp(): void {
     $this->database = $this->prophesize(Connection::class);
@@ -64,6 +66,7 @@ class MyCustomServiceTest extends UnitTestCase {
 
     $this->translationManager = $this->prophesize(TranslationManager::class);
 
+    // Building and managing dependency injection.
     $container = new ContainerBuilder();
     $container->set('string_translation', $this->translationManager->reveal());
     \Drupal::setContainer($container);

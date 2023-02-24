@@ -9,7 +9,7 @@ services:
     factory: cache_factory:get
     arguments: [custom_cache]
   custom_module.content_subscriber:
-    class: Drupal\custom_module\EventSubscriber\ContentOperationEventSubscriber
+    class: Drupal\custom_module\EventSubscriber\ContentOperationSubscriber
     arguments: ['@custom_module.data_service', '@messenger']
     tags:
       - { name: 'event_subscriber' }
