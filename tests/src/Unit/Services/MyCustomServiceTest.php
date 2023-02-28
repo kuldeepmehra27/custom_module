@@ -435,7 +435,7 @@ class MyCustomServiceTest extends UnitTestCase {
   /**
    * Function for unset myServiceObject object.
    */
-  public function tearDown() {
+  public function tearDown():void {
     unset($this->myServiceObject);
   }
 
