@@ -10,6 +10,8 @@ use Drupal\Component\Serialization\Json;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Drupal\node\NodeInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Psr7\Request;
 
 /**
  * My custom service class.
@@ -45,6 +47,15 @@ class MyCustomService {
    * @var \Drupal\Core\Cache\CacheBackendInterface
    */
   protected $cacheBackend;
+
+  /**
+   * The external end point.
+   *
+   * Or we can define in config.
+   *
+   * @var string
+   */
+  const EXTERNAL_END_POINT = 'https://gorest.co.in/public/v2/posts';
 
   /**
    * Constructs a my custom service object.
@@ -321,6 +332,88 @@ class MyCustomService {
         break;
     }
     return $message;
+  }
+
+  /**
+   * Function to return external API data.
+   *
+   * @return array
+   *   User data list.
+   */
+  public function getExternalApiData() {
+    $data = [];
+    try {
+      $response = $this->httpClient->request('GET', self::EXTERNAL_END_POINT);
+      if ($response->getStatusCode() != 200) {
+        return $data;
+      }
+      $contents = $response->getBody()->getContents() ?: '';
+      if (!empty($contents)) {
+        $data = Json::decode($contents);
+      }
+    }
+    catch (RequestException $e) {
+      throw new RequestException('There was an error communicating with the server.', new Request('GET', self::EXTERNAL_END_POINT));
+    }
+    return $data;
+  }
+
+  /**
+   * Makes a POST request to an external API.
+   *
+   * @return string
+   *   The response body.
+   */
+  public function postRequest() {
+    $data = [
+      'user_name' => 'Kuldeep',
+      'email' => 'kuldeep@kuldeep.com',
+    ];
+    $headers = [
+      'Accept' => 'application/json',
+      'Content-type' => 'application/json',
+      'Authorization' => 'Bearer XX990XXEEDD',
+    ];
+    $response = $this->httpClient->request(
+      'POST',
+      'https://gorest.co.in/public/v2/posts',
+      [
+        // Optional.
+        'timeout' => 5,
+        // Optional.
+        'http_errors' => FALSE,
+        'headers' => $headers,
+        'json' => $data,
+      ]
+    );
+    $statusCode = $response->getStatusCode();
+    $data = Json::decode((string) $response->getBody());
+    return [$statusCode, $data];
+  }
+
+  /**
+   * Makes a POST request to get token.
+   *
+   * @return string
+   *   The token.
+   */
+  public function postRequestGetToken() {
+    $apiUrl = 'https://get-api/get/token';
+    $response = $this->httpClient->post(
+      'POST',
+      $apiUrl,
+      [
+        'Accept' => 'application/json',
+        'Content-type' => 'application/json',
+        'form_params' => [
+          'grant_type' => 'client_credentials',
+          'client_id' => 'client_id',
+          'client_secret' => 'client_secret',
+        ],
+      ],
+    );
+    $token = Json::decode($response->getBody());
+    return $token;
   }
 
 }

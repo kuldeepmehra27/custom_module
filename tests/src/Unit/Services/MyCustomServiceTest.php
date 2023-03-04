@@ -21,6 +21,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslationManager;
+use GuzzleHttp\Exception\RequestException;
 
 /**
  * Tests the my custom service.
@@ -47,7 +48,12 @@ class MyCustomServiceTest extends UnitTestCase {
     $this->cacheBackend = $this->prophesize(CacheBackendInterface::class);
 
     $data = [
-      'My data',
+      [
+        'id' => 123,
+        'user_id' => 456,
+        'title' => 'test',
+        'body' => 'test body',
+      ],
     ];
     $this->mockHandler = new MockHandler([
       new Response(200, [], Json::encode($data)),
@@ -410,6 +416,7 @@ class MyCustomServiceTest extends UnitTestCase {
     $result = $this->myServiceObject->getAllNodes();
     $this->assertArrayHasKey('data', $result);
   }
+
   /**
    * Function to get workflow action message.
    *
@@ -437,6 +444,68 @@ class MyCustomServiceTest extends UnitTestCase {
    */
   public function tearDown():void {
     unset($this->myServiceObject);
+  }
+
+  /**
+   * Function to test external API data.
+   *
+   * @covers ::getExternalApiData
+   */
+  public function testGetExternalApiData() {
+
+    // Case 1: If return empty results.
+    $data = [];
+    $this->mockHandler = new MockHandler([
+      new Response(200, [], Json::encode($data)),
+    ]);
+    $handlerStack = HandlerStack::create($this->mockHandler);
+    $this->httpClient = new Client(['handler' => $handlerStack]);
+    $myServiceObject = new MyCustomService(
+      $this->database->reveal(),
+      $this->entityTypeManager->reveal(),
+      $this->httpClient,
+      $this->cacheBackend->reveal()
+    );
+    $result = $myServiceObject->getExternalApiData();
+    $this->assertEmpty($result);
+
+    // Case 2: If status code not equal 200.
+    $this->mockHandler = new MockHandler([
+      new Response(201, [], Json::encode(['http_errors' => TRUE]))
+    ]);
+    $handlerStack = HandlerStack::create($this->mockHandler);
+    $this->httpClient = new Client(['handler' => $handlerStack]);
+
+    $myServiceObject = new MyCustomService(
+      $this->database->reveal(),
+      $this->entityTypeManager->reveal(),
+      $this->httpClient,
+      $this->cacheBackend->reveal()
+    );
+    $result = $myServiceObject->getExternalApiData();
+    $this->assertEmpty($result);
+  }
+
+  /**
+   * Function to test external API data exception.
+   *
+   * @covers ::getExternalApiData
+   */
+  public function testGetExternalApiDataException() {
+    $this->mockHandler = new MockHandler([
+      new Response(500)
+    ]);
+    $handlerStack = HandlerStack::create($this->mockHandler);
+    $this->httpClient = new Client(['handler' => $handlerStack]);
+
+    $this->myServiceObject = new MyCustomService(
+      $this->database->reveal(),
+      $this->entityTypeManager->reveal(),
+      $this->httpClient,
+      $this->cacheBackend->reveal()
+    );
+    $this->expectException(RequestException::class);
+    $this->myServiceObject->getExternalApiData();
   }
 
 }
