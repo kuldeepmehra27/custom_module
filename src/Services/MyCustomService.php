@@ -361,6 +361,8 @@ class MyCustomService {
   /**
    * Makes a POST request to an external API.
    *
+   * Reference method.
+   *
    * @return string
    *   The response body.
    */
@@ -376,7 +378,7 @@ class MyCustomService {
     ];
     $response = $this->httpClient->request(
       'POST',
-      'https://gorest.co.in/public/v2/posts',
+      'https://api-to-post-data/posts',
       [
         // Optional.
         'timeout' => 5,
@@ -393,6 +395,8 @@ class MyCustomService {
 
   /**
    * Makes a POST request to get token.
+   *
+   * Reference method.
    *
    * @return string
    *   The token.
